@@ -4,15 +4,34 @@ import { apiGet } from '../misc/config';
 const Show = () => {
 const { id } = useParams();
 const [show,setShow] = useState(null);
+const [isLoading,setIsLoading] = useState(true);
+const [error,setError] = useState(null);
 // console.log(params);
 useEffect(() => {
+    let isMounted = true;
     apiGet(`/shows/${id}?embed[]=seasons&embed[]=cast`).then(results=>{
-        setShow(results);
-    })
+            if(isMounted){
+            setShow(results);
+            setIsLoading(false);}
+    }).catch(err =>{
+        if(isMounted){
+            setError(err.message);
+            setIsLoading(false);
+        }
+    });
+    return () => {
+        isMounted = false;
+    }
 
 }, [id])
 console.log(show);
-  return (
+if(isLoading){
+   return <div>Loading ...</div>
+}
+if(error){
+    return <div>Error Occured : {error}</div>
+} 
+return (
     <div>
       this is show page  
     </div>
